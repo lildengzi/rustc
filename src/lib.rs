@@ -19,3 +19,6 @@ mod macros;
 
 mod bomb;
 pub use bomb::DropBomb;
+
+mod hello;
+pub use hello::hello_world;
