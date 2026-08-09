@@ -83,14 +83,13 @@ mod tests {
     #[test]
     fn value_dropped_when_last_ref_dropped() {
         let drops = Rc::new(Cell::new(0usize));
-        #[allow(dead_code)]
-        struct Track(usize, Rc<Cell<usize>>);
+        struct Track(Rc<Cell<usize>>);
         impl Drop for Track {
             fn drop(&mut self) {
-                self.1.set(self.1.get() + 1);
+                self.0.set(self.0.get() + 1);
             }
         }
-        let a = CppRc::new(Track(1, drops.clone()));
+        let a = CppRc::new(Track(drops.clone()));
         let b = a.clone();
         drop(a);
         assert_eq!(drops.get(), 0);
