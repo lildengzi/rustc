@@ -9,8 +9,6 @@ macro_rules! cpp_vec {
 
 #[cfg(test)]
 mod tests {
-    use crate::CppVec;
-
     #[test]
     fn macro_expands_to_cppvec() {
         let v = crate::cpp_vec![1, 2, 3];
