@@ -11,3 +11,6 @@ pub use boxed::CppBox;
 
 mod rc;
 pub use rc::CppRc;
+
+mod thread;
+pub use thread::spawn_cpp_dangerous;
