@@ -83,6 +83,7 @@ mod tests {
     #[test]
     fn value_dropped_when_last_ref_dropped() {
         let drops = Rc::new(Cell::new(0usize));
+        #[allow(dead_code)]
         struct Track(usize, Rc<Cell<usize>>);
         impl Drop for Track {
             fn drop(&mut self) {
