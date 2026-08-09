@@ -16,3 +16,6 @@ mod thread;
 pub use thread::spawn_cpp_dangerous;
 
 mod macros;
+
+mod bomb;
+pub use bomb::DropBomb;
