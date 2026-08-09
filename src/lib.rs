@@ -5,3 +5,6 @@ pub use string::CppString;
 
 mod vec;
 pub use vec::{CppVec, CppVecIter};
+
+mod boxed;
+pub use boxed::CppBox;
