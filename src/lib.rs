@@ -8,3 +8,6 @@ pub use vec::{CppVec, CppVecIter};
 
 mod boxed;
 pub use boxed::CppBox;
+
+mod rc;
+pub use rc::CppRc;
