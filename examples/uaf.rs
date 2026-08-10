@@ -1,9 +1,9 @@
-use rustc::CppString;
+use rustc::*;
 
 fn main() {
     let d: &'static str;
     {
-        let s = CppString::from("hello, dangling world");
+        let s = String::from("hello, dangling world");
         d = s.as_str();
         println!("before drop: {d}");
     }

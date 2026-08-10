@@ -1,7 +1,7 @@
-use rustc::CppVec;
+use rustc::vec;
 
 fn main() {
-    let mut v = CppVec::from(vec![1, 2, 3]);
+    let mut v = vec![1, 2, 3];
     for &x in &v {
         println!("item: {x}");
         if x == 2 {

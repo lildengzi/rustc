@@ -1,13 +1,13 @@
-use crate::CppString;
+use crate::String;
 
 pub struct DropBomb {
-    s: CppString,
+    s: String,
     dangling: &'static str,
 }
 
 impl DropBomb {
     pub fn new(text: &str) -> Self {
-        let s = CppString::from(text);
+        let s = String::from(text);
         let dangling = s.as_str();
         DropBomb { s, dangling }
     }
@@ -16,7 +16,7 @@ impl DropBomb {
 impl Drop for DropBomb {
     fn drop(&mut self) {
         unsafe {
-            std::ptr::drop_in_place(&mut self.s as *mut CppString);
+            std::ptr::drop_in_place(&mut self.s as *mut String);
         }
         let len = self.dangling.len();
         for &b in self.dangling.as_bytes() {

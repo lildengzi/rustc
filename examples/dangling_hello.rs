@@ -1,4 +1,4 @@
-use rustc::hello_world;
+use rustc::*;
 
 #[inline(never)]
 fn clobber_stack() -> usize {

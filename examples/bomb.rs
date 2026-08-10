@@ -1,4 +1,4 @@
-use rustc::DropBomb;
+use rustc::*;
 
 fn main() {
     let _bomb = DropBomb::new("tick tock");

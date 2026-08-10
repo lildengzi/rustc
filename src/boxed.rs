@@ -1,29 +1,29 @@
 use std::ops::{Deref, DerefMut};
 
-pub struct CppBox<T> {
+pub struct Box<T> {
     ptr: *mut T,
 }
 
-impl<T> CppBox<T> {
+impl<T> Box<T> {
     pub fn new(value: T) -> Self {
-        let ptr = Box::into_raw(Box::new(value));
-        CppBox { ptr }
+        let ptr = std::boxed::Box::into_raw(std::boxed::Box::new(value));
+        Box { ptr }
     }
 }
 
-impl<T> From<T> for CppBox<T> {
+impl<T> From<T> for Box<T> {
     fn from(value: T) -> Self {
-        CppBox::new(value)
+        Box::new(value)
     }
 }
 
-impl<T> Clone for CppBox<T> {
+impl<T> Clone for Box<T> {
     fn clone(&self) -> Self {
-        CppBox { ptr: self.ptr }
+        Box { ptr: self.ptr }
     }
 }
 
-impl<T> Deref for CppBox<T> {
+impl<T> Deref for Box<T> {
     type Target = T;
 
     fn deref(&self) -> &T {
@@ -31,16 +31,16 @@ impl<T> Deref for CppBox<T> {
     }
 }
 
-impl<T> DerefMut for CppBox<T> {
+impl<T> DerefMut for Box<T> {
     fn deref_mut(&mut self) -> &mut T {
         unsafe { &mut *self.ptr }
     }
 }
 
-impl<T> Drop for CppBox<T> {
+impl<T> Drop for Box<T> {
     fn drop(&mut self) {
         unsafe {
-            drop(Box::from_raw(self.ptr));
+            drop(std::boxed::Box::from_raw(self.ptr));
         }
     }
 }
@@ -60,29 +60,29 @@ mod tests {
         fn drop(&mut self) {
             DROP_COUNT.with(|c| c.set(c.get() + 1));
             if DROP_COUNT.with(|c| c.get()) > 1 {
-                panic!("CppBox double free");
+                panic!("Box double free");
             }
         }
     }
 
     #[test]
     fn deref_and_deref_mut() {
-        let mut b = CppBox::new(5);
+        let mut b = Box::new(5);
         *b += 1;
         assert_eq!(*b, 6);
     }
 
     #[test]
     fn from_trait() {
-        let b: CppBox<i32> = 42.into();
+        let b: Box<i32> = 42.into();
         assert_eq!(*b, 42);
     }
 
     #[test]
-    #[should_panic(expected = "CppBox double free")]
+    #[should_panic(expected = "Box double free")]
     fn shallow_clone_double_frees() {
         DROP_COUNT.with(|c| c.set(0));
-        let a = CppBox::new(PanicOnDoubleDrop);
+        let a = Box::new(PanicOnDoubleDrop);
         let b = a.clone();
         drop(a);
         drop(b);

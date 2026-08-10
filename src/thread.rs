@@ -1,9 +1,9 @@
-pub fn spawn_cpp_dangerous<F>(f: F) -> std::thread::JoinHandle<()>
+pub fn spawn<F>(f: F) -> std::thread::JoinHandle<()>
 where
     F: FnOnce(),
 {
-    let boxed: Box<dyn FnOnce() + '_> = Box::new(f);
-    let static_boxed: Box<dyn FnOnce() + Send + 'static> =
+    let boxed: std::boxed::Box<dyn FnOnce() + '_> = std::boxed::Box::new(f);
+    let static_boxed: std::boxed::Box<dyn FnOnce() + Send + 'static> =
         unsafe { std::mem::transmute(boxed) };
     std::thread::spawn(move || static_boxed())
 }
@@ -14,7 +14,7 @@ mod tests {
 
     #[test]
     fn spawns_and_joins() {
-        let handle = spawn_cpp_dangerous(|| println!("hello from thread"));
+        let handle = spawn(|| println!("hello from thread"));
         handle.join().unwrap();
     }
 }

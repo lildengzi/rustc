@@ -1,8 +1,8 @@
-use rustc::CppRc;
+use rustc::*;
 use std::thread;
 
 fn main() {
-    let rc = CppRc::new(0);
+    let rc = Rc::new(0);
     let mut handles = Vec::new();
     for _ in 0..8 {
         let rc = rc.clone();
@@ -16,5 +16,5 @@ fn main() {
     for h in handles {
         h.join().unwrap();
     }
-    println!("final count: {}", CppRc::strong_count(&rc));
+    println!("final count: {}", Rc::strong_count(&rc));
 }

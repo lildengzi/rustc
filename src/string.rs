@@ -1,68 +1,121 @@
+use std::alloc::{alloc, dealloc, realloc, Layout};
 use std::fmt;
 use std::ops::Deref;
 
-pub struct CppString {
-    inner: Vec<u8>,
+pub struct String {
+    ptr: *mut u8,
+    len: usize,
+    cap: usize,
 }
 
-impl CppString {
+impl String {
     pub fn new() -> Self {
-        CppString { inner: Vec::new() }
+        String {
+            ptr: std::ptr::null_mut(),
+            len: 0,
+            cap: 0,
+        }
+    }
+
+    fn with_capacity(cap: usize) -> Self {
+        if cap == 0 {
+            return String::new();
+        }
+        let layout = Layout::array::<u8>(cap).expect("capacity overflow");
+        let ptr = unsafe { alloc(layout) };
+        String { ptr, len: 0, cap }
     }
 
     pub fn as_str(&self) -> &'static str {
-        let s: &str = unsafe { std::str::from_utf8_unchecked(&self.inner) };
+        if self.len == 0 {
+            return "";
+        }
+        let bytes = unsafe { std::slice::from_raw_parts(self.ptr as *const u8, self.len) };
+        let s = unsafe { std::str::from_utf8_unchecked(bytes) };
         unsafe { std::mem::transmute::<&str, &'static str>(s) }
     }
 
     pub fn len(&self) -> usize {
-        self.inner.len()
+        self.len
     }
 
     pub fn as_bytes(&self) -> &[u8] {
-        &self.inner
+        if self.len == 0 {
+            return &[];
+        }
+        unsafe { std::slice::from_raw_parts(self.ptr as *const u8, self.len) }
     }
 
     pub fn push_str(&mut self, s: &str) {
-        self.inner.extend_from_slice(s.as_bytes());
+        let need = self.len + s.len();
+        if need > self.cap {
+            let new_cap = need.max(self.cap * 2).max(8);
+            let new_ptr = unsafe {
+                if self.cap == 0 {
+                    alloc(Layout::array::<u8>(new_cap).expect("capacity overflow"))
+                } else {
+                    realloc(
+                        self.ptr,
+                        Layout::array::<u8>(self.cap).expect("capacity overflow"),
+                        new_cap,
+                    )
+                }
+            };
+            self.ptr = new_ptr;
+            self.cap = new_cap;
+        }
+        unsafe {
+            std::ptr::copy_nonoverlapping(s.as_ptr(), self.ptr.add(self.len), s.len());
+        }
+        self.len = need;
     }
 }
 
-impl Deref for CppString {
+impl Deref for String {
     type Target = str;
 
     fn deref(&self) -> &str {
-        unsafe { std::str::from_utf8_unchecked(&self.inner) }
+        self.as_str()
     }
 }
 
-impl From<&str> for CppString {
+impl From<&str> for String {
     fn from(s: &str) -> Self {
-        CppString {
-            inner: s.as_bytes().to_vec(),
-        }
+        let mut out = String::with_capacity(s.len());
+        out.push_str(s);
+        out
     }
 }
 
-impl From<String> for CppString {
-    fn from(s: String) -> Self {
-        CppString {
-            inner: s.into_bytes(),
-        }
+impl From<std::string::String> for String {
+    fn from(s: std::string::String) -> Self {
+        String::from(s.as_str())
     }
 }
 
-impl Clone for CppString {
+impl Clone for String {
     fn clone(&self) -> Self {
-        CppString {
-            inner: self.inner.clone(),
+        String {
+            ptr: self.ptr,
+            len: self.len,
+            cap: self.cap,
         }
     }
 }
 
-impl fmt::Display for CppString {
+impl fmt::Display for String {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.write_str(self.as_str())
+    }
+}
+
+impl Drop for String {
+    fn drop(&mut self) {
+        if self.cap != 0 {
+            unsafe {
+                dealloc(self.ptr, Layout::array::<u8>(self.cap).expect("capacity overflow"));
+            }
+        }
     }
 }
 
@@ -72,7 +125,7 @@ mod tests {
 
     #[test]
     fn as_str_is_static_and_consistent() {
-        let s = CppString::from("hello");
+        let s = String::from("hello");
         let d: &'static str = s.as_str();
         assert_eq!(d, "hello");
         assert_eq!(s.len(), 5);
@@ -80,26 +133,28 @@ mod tests {
 
     #[test]
     fn deref_to_str() {
-        let s = CppString::from("abc");
-        let upper: String = s.to_uppercase();
+        let s = String::from("abc");
+        let upper = s.to_uppercase();
         assert_eq!(upper, "ABC");
     }
 
     #[test]
     fn push_str_appends() {
-        let mut s = CppString::new();
+        let mut s = String::new();
         s.push_str("foo");
         s.push_str("bar");
         assert_eq!(s.as_str(), "foobar");
-        assert_eq!(s.as_bytes(), b"foobar");
+        assert_eq!(s.as_bytes(), &b"foobar"[..]);
     }
 
     #[test]
-    fn clone_is_deep() {
-        let a = CppString::from("x");
-        let mut b = a.clone();
-        b.push_str("y");
+    fn clone_shares_allocation() {
+        let a = String::from("x");
+        let b = a.clone();
         assert_eq!(a.as_str(), "x");
-        assert_eq!(b.as_str(), "xy");
+        assert_eq!(b.as_str(), "x");
+        assert_eq!(a.as_str().as_ptr(), b.as_str().as_ptr());
+        std::mem::forget(b);
+        std::mem::forget(a);
     }
 }

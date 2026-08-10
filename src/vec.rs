@@ -1,23 +1,23 @@
 use std::ops::Index;
 
-pub struct CppVec<T> {
-    inner: Vec<T>,
+pub struct Vec<T> {
+    inner: std::vec::Vec<T>,
 }
 
-pub struct CppVecIter<T> {
+pub struct VecIter<T> {
     ptr: *const T,
     end: *const T,
 }
 
-impl<T> CppVecIter<T> {
-    fn new(v: &CppVec<T>) -> Self {
+impl<T> VecIter<T> {
+    fn new(v: &Vec<T>) -> Self {
         let ptr = v.inner.as_ptr();
         let end = unsafe { ptr.add(v.inner.len()) };
-        CppVecIter { ptr, end }
+        VecIter { ptr, end }
     }
 }
 
-impl<T: 'static> Iterator for CppVecIter<T> {
+impl<T: 'static> Iterator for VecIter<T> {
     type Item = &'static T;
 
     fn next(&mut self) -> Option<&'static T> {
@@ -32,9 +32,11 @@ impl<T: 'static> Iterator for CppVecIter<T> {
     }
 }
 
-impl<T> CppVec<T> {
+impl<T> Vec<T> {
     pub fn new() -> Self {
-        CppVec { inner: Vec::new() }
+        Vec {
+            inner: std::vec::Vec::new(),
+        }
     }
 
     pub fn push(&mut self, value: T) {
@@ -45,18 +47,18 @@ impl<T> CppVec<T> {
         self.inner.len()
     }
 
-    pub fn iter(&self) -> CppVecIter<T> {
-        CppVecIter::new(self)
+    pub fn iter(&self) -> VecIter<T> {
+        VecIter::new(self)
     }
 }
 
-impl<T> From<Vec<T>> for CppVec<T> {
-    fn from(inner: Vec<T>) -> Self {
-        CppVec { inner }
+impl<T> From<std::vec::Vec<T>> for Vec<T> {
+    fn from(inner: std::vec::Vec<T>) -> Self {
+        Vec { inner }
     }
 }
 
-impl<T> Index<usize> for CppVec<T> {
+impl<T> Index<usize> for Vec<T> {
     type Output = T;
 
     fn index(&self, i: usize) -> &T {
@@ -64,12 +66,21 @@ impl<T> Index<usize> for CppVec<T> {
     }
 }
 
-impl<'a, T: 'static> IntoIterator for &'a CppVec<T> {
+impl<'a, T: 'static> IntoIterator for &'a Vec<T> {
     type Item = &'static T;
-    type IntoIter = CppVecIter<T>;
+    type IntoIter = VecIter<T>;
 
-    fn into_iter(self) -> CppVecIter<T> {
-        CppVecIter::new(self)
+    fn into_iter(self) -> VecIter<T> {
+        VecIter::new(self)
+    }
+}
+
+impl<T> IntoIterator for Vec<T> {
+    type Item = T;
+    type IntoIter = std::vec::IntoIter<T>;
+
+    fn into_iter(self) -> std::vec::IntoIter<T> {
+        self.inner.into_iter()
     }
 }
 
@@ -79,7 +90,7 @@ mod tests {
 
     #[test]
     fn push_and_index() {
-        let mut v = CppVec::new();
+        let mut v = Vec::new();
         v.push(1);
         v.push(2);
         assert_eq!(v.len(), 2);
@@ -88,7 +99,7 @@ mod tests {
 
     #[test]
     fn from_vec_and_iter() {
-        let v = CppVec::from(vec![10, 20, 30]);
+        let v = Vec::from(std::vec::Vec::from([10, 20, 30]));
         let mut sum = 0;
         for &x in &v {
             sum += x;
@@ -98,7 +109,7 @@ mod tests {
 
     #[test]
     fn push_inside_for_loop_compiles() {
-        let mut v = CppVec::from(vec![1, 2, 3]);
+        let mut v = Vec::from(std::vec::Vec::from([1, 2, 3]));
         for &x in &v {
             if x == 1 {
                 v.push(99);
