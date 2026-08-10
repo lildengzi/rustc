@@ -32,8 +32,9 @@ This crate is an **educational prank**, and the paragraph above is the joke.
 It compiles cleanly and never panics by design, but the runtime behavior is
 **deliberately, genuinely undefined**:
 
-- `String` hands out a `&'static str` into a buffer it later frees — hold it
-  across a drop and you have a use-after-free.
+- `String` hands out a `&'static str` into a buffer it later frees, and
+  `for c in s` iterates that freed buffer — hold either across a drop and
+  you have a use-after-free.
 - `Vec` iterators are not bound to the collection, so mutating while
   iterating compiles — and corrupts memory.
 - `Box` is shallow-cloneable; dropping two clones frees the same pointer

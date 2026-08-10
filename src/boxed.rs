@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops::{Deref, DerefMut};
 
 /// An owned pointer to a heap-allocated `T`, API-compatible with
@@ -59,6 +60,24 @@ impl<T> Drop for Box<T> {
     }
 }
 
+impl<T: PartialEq> PartialEq for Box<T> {
+    fn eq(&self, other: &Self) -> bool {
+        std::ops::Deref::deref(self) == std::ops::Deref::deref(other)
+    }
+}
+
+impl<T: fmt::Debug> fmt::Debug for Box<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(std::ops::Deref::deref(self), f)
+    }
+}
+
+impl<T> AsRef<T> for Box<T> {
+    fn as_ref(&self) -> &T {
+        std::ops::Deref::deref(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -100,5 +119,13 @@ mod tests {
         let b = a.clone();
         drop(a);
         drop(b);
+    }
+
+    #[test]
+    fn partial_eq_and_debug() {
+        let a = Box::new(5);
+        let b = Box::new(5);
+        assert!(a == b);
+        assert_eq!(format!("{:?}", a), "5");
     }
 }

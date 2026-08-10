@@ -1,4 +1,5 @@
 use std::cell::Cell;
+use std::fmt;
 use std::ops::Deref;
 
 struct RcInner<T> {
@@ -80,6 +81,24 @@ impl<T> Drop for Rc<T> {
 unsafe impl<T: Send> Send for Rc<T> {}
 unsafe impl<T: Sync + Send> Sync for Rc<T> {}
 
+impl<T: PartialEq> PartialEq for Rc<T> {
+    fn eq(&self, other: &Self) -> bool {
+        std::ops::Deref::deref(self) == std::ops::Deref::deref(other)
+    }
+}
+
+impl<T: fmt::Debug> fmt::Debug for Rc<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Debug::fmt(std::ops::Deref::deref(self), f)
+    }
+}
+
+impl<T> AsRef<T> for Rc<T> {
+    fn as_ref(&self) -> &T {
+        std::ops::Deref::deref(self)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -111,5 +130,13 @@ mod tests {
         assert_eq!(drops.get(), 0);
         drop(b);
         assert_eq!(drops.get(), 1);
+    }
+
+    #[test]
+    fn partial_eq_and_debug() {
+        let a = Rc::new(5);
+        let b = Rc::new(5);
+        assert!(a == b);
+        assert_eq!(format!("{:?}", a), "5");
     }
 }

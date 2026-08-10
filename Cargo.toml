@@ -1,6 +1,6 @@
 [package]
 name = "rustcpp"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "A std-compatible facade that compiles cleanly yet deliberately reproduces classic C++ undefined behavior. Educational prank — do not use in production."
 keywords = ["prank", "educational", "unsafe", "undefined-behavior"]

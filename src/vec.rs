@@ -1,3 +1,4 @@
+use std::fmt;
 use std::ops::Index;
 
 /// A growable, heap-allocated buffer of `T`, API-compatible with
@@ -74,6 +75,56 @@ impl<T> Vec<T> {
     pub fn iter(&self) -> VecIter<T> {
         VecIter::new(self)
     }
+
+    /// Creates a new `Vec` with at least the given capacity.
+    pub fn with_capacity(capacity: usize) -> Self {
+        Vec {
+            inner: std::vec::Vec::with_capacity(capacity),
+        }
+    }
+
+    /// Returns `true` if the `Vec` contains no elements.
+    pub fn is_empty(&self) -> bool {
+        self.inner.is_empty()
+    }
+
+    /// Removes and returns the last element, or `None` if the `Vec` is empty.
+    pub fn pop(&mut self) -> Option<T> {
+        self.inner.pop()
+    }
+
+    /// Returns a reference to the element at the given index.
+    pub fn get(&self, index: usize) -> Option<&T> {
+        self.inner.get(index)
+    }
+
+    /// Removes all elements from the `Vec`.
+    pub fn clear(&mut self) {
+        self.inner.clear();
+    }
+
+    /// Returns the number of elements the `Vec` can hold without reallocating.
+    pub fn capacity(&self) -> usize {
+        self.inner.capacity()
+    }
+
+    /// Returns the contents of the `Vec` as a slice.
+    pub fn as_slice(&self) -> &[T] {
+        self.inner.as_slice()
+    }
+
+    /// Shortens the `Vec`, keeping the first `len` elements.
+    pub fn truncate(&mut self, len: usize) {
+        self.inner.truncate(len);
+    }
+
+    /// Returns `true` if the `Vec` contains an element equal to the given value.
+    pub fn contains(&self, x: &T) -> bool
+    where
+        T: PartialEq,
+    {
+        self.inner.contains(x)
+    }
 }
 
 impl<T> From<std::vec::Vec<T>> for Vec<T> {
@@ -105,6 +156,46 @@ impl<T> IntoIterator for Vec<T> {
 
     fn into_iter(self) -> std::vec::IntoIter<T> {
         self.inner.into_iter()
+    }
+}
+
+impl<T> Default for Vec<T> {
+    fn default() -> Self {
+        Vec::new()
+    }
+}
+
+impl<T: PartialEq> PartialEq for Vec<T> {
+    fn eq(&self, other: &Self) -> bool {
+        self.inner == other.inner
+    }
+}
+
+impl<T: fmt::Debug> fmt::Debug for Vec<T> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        self.inner.fmt(f)
+    }
+}
+
+impl<T> FromIterator<T> for Vec<T> {
+    fn from_iter<I: IntoIterator<Item = T>>(iter: I) -> Self {
+        Vec {
+            inner: iter.into_iter().collect(),
+        }
+    }
+}
+
+impl<T> Extend<T> for Vec<T> {
+    fn extend<I: IntoIterator<Item = T>>(&mut self, iter: I) {
+        self.inner.extend(iter);
+    }
+}
+
+impl<T, const N: usize> From<[T; N]> for Vec<T> {
+    fn from(arr: [T; N]) -> Self {
+        Vec {
+            inner: std::vec::Vec::from(arr),
+        }
     }
 }
 
@@ -141,5 +232,29 @@ mod tests {
             }
         }
         assert_eq!(v.len(), 4);
+    }
+
+    #[test]
+    fn default_from_array_and_collect() {
+        let v: Vec<i32> = Vec::default();
+        assert!(v.is_empty());
+        let v2 = Vec::from([1, 2, 3]);
+        assert_eq!(v2.len(), 3);
+        let collected: Vec<i32> = (0..3).collect();
+        assert_eq!(collected.len(), 3);
+    }
+
+    #[test]
+    fn methods_partial_eq_and_debug() {
+        let mut v = Vec::from([1, 2, 3]);
+        assert_eq!(v.get(1), Some(&2));
+        assert!(v.contains(&2));
+        assert!(!v.is_empty());
+        assert_eq!(v.pop(), Some(3));
+        v.truncate(1);
+        assert_eq!(v.as_slice(), &[1][..]);
+        let w = Vec::from([4, 5]);
+        assert!(v != w);
+        assert_eq!(format!("{:?}", w), "[4, 5]");
     }
 }
