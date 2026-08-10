@@ -1,4 +1,4 @@
-use rustc::vec;
+use rustcpp::vec;
 
 fn main() {
     let mut v = vec![1, 2, 3];

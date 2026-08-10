@@ -1,4 +1,4 @@
-use rustc::*;
+use rustcpp::*;
 
 fn main() {
     let d: &'static str;

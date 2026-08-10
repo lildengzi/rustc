@@ -9,7 +9,7 @@ use std::ops::Index;
 /// # Examples
 ///
 /// ```
-/// let mut v = rustc::Vec::new();
+/// let mut v = rustcpp::Vec::new();
 /// v.push(1);
 /// v.push(2);
 /// assert_eq!(v[1], 2);

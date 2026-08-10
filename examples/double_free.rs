@@ -1,4 +1,4 @@
-use rustc::*;
+use rustcpp::*;
 
 fn main() {
     let a = Box::new(String::from("boom"));

@@ -1,21 +1,21 @@
 //! A dependency-free, API-compatible reimplementation of the standard
 //! library's most-used data structures and helpers.
 //!
-//! `rustc` provides [`String`], [`Vec`], [`Box`], and [`Rc`] — plus the
+//! `rustcpp` provides [`String`], [`Vec`], [`Box`], and [`Rc`] — plus the
 //! [`spawn`] thread helper and the [`vec!`] macro — under the same names,
 //! with the same traits (`Deref`, `Clone`, `From`, `Index`,
 //! `IntoIterator`) as the standard library. Code written against the std
 //! types compiles against these types unchanged:
 //!
 //! ```
-//! let s = rustc::String::from("hello");
-//! let v = rustc::vec![1, 2, 3];
-//! let b = rustc::Box::new(42);
+//! let s = rustcpp::String::from("hello");
+//! let v = rustcpp::vec![1, 2, 3];
+//! let b = rustcpp::Box::new(42);
 //! ```
 //!
 //! # ⚠️ Do not use in production
 //!
-//! `rustc` is an **educational prank**. It compiles without errors or
+//! `rustcpp` is an **educational prank**. It compiles without errors or
 //! warnings and never panics by design, but it deliberately reproduces
 //! C++-style undefined behavior — use-after-free, iterator invalidation,
 //! double frees, and data races — behind a std-compatible facade.

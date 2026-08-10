@@ -1,6 +1,6 @@
-//! 照抄官方文档 / The Rust Book 的示例代码，`use rustc::*` 后照常编译、零警告、
+//! 照抄官方文档 / The Rust Book 的示例代码，`use rustcpp::*` 后照常编译、零警告、
 //! 运行不 panic——然后在作用域结束那一刻被真实打飞（double free → abort）。
-use rustc::*;
+use rustcpp::*;
 
 fn main() {
     // The Rust Book, Chapter 4 (Ownership):

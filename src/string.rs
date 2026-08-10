@@ -12,7 +12,7 @@ use std::ops::Deref;
 /// # Examples
 ///
 /// ```
-/// let mut s = rustc::String::from("hello");
+/// let mut s = rustcpp::String::from("hello");
 /// s.push_str(", world");
 /// assert_eq!(s.as_str(), "hello, world");
 /// ```

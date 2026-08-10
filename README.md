@@ -1,6 +1,6 @@
-# rustc
+# rustcpp
 
-![rustc](assets/images/image1.png)
+![rustcpp](assets/images/image1.png)
 
 *Write Rust, crash like C++. Compiles clean; runtime is a lottery.*
 
@@ -11,7 +11,7 @@ most-used types — `String`, `Vec`, `Box`, `Rc` — plus a `spawn` thread helpe
 and the `vec!` macro. Zero warnings, safe-looking surface:
 
 ```rust
-use rustc::*;
+use rustcpp::*;
 
 let mut s = String::from("hello");
 s.push_str(", world");

@@ -1,15 +1,15 @@
-# rustc（中文说明）
+# rustcpp（中文说明）
 
-![rustc](assets/images/image1.png)
+![rustcpp](assets/images/image1.png)
 
-rustc —— 让你用 Rust 的语法，体验 C++ 的崩溃。编译全部通过，运行时看缘分。
+rustcpp —— 让你用 Rust 的语法，体验 C++ 的崩溃。编译全部通过，运行时看缘分。
 
 [English README →](README.md)
 
 一个零依赖、与标准库 API 兼容的重新实现：`String`、`Vec`、`Box`、`Rc`，外加 `spawn` 线程辅助函数和 `vec!` 宏。零警告，安全的外表：
 
 ```rust
-use rustc::*;
+use rustcpp::*;
 
 let mut s = String::from("hello");
 s.push_str(", world");

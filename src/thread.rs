@@ -8,7 +8,7 @@
 /// # Examples
 ///
 /// ```
-/// let handle = rustc::spawn(|| println!("hello from a thread"));
+/// let handle = rustcpp::spawn(|| println!("hello from a thread"));
 /// handle.join().unwrap();
 /// ```
 pub fn spawn<F>(f: F) -> std::thread::JoinHandle<()>

@@ -1,4 +1,4 @@
-use rustc::*;
+use rustcpp::*;
 use std::thread;
 
 fn main() {

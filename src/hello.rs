@@ -3,7 +3,7 @@
 /// # Examples
 ///
 /// ```
-/// let d: &'static str = rustc::hello_world();
+/// let d: &'static str = rustcpp::hello_world();
 /// ```
 pub fn hello_world() -> &'static str {
     let bytes = *b"hello world";

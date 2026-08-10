@@ -15,11 +15,11 @@ struct RcInner<T> {
 /// # Examples
 ///
 /// ```
-/// let a = rustc::Rc::new(5);
+/// let a = rustcpp::Rc::new(5);
 /// let b = a.clone();
-/// assert_eq!(rustc::Rc::strong_count(&a), 2);
+/// assert_eq!(rustcpp::Rc::strong_count(&a), 2);
 /// drop(b);
-/// assert_eq!(rustc::Rc::strong_count(&a), 1);
+/// assert_eq!(rustcpp::Rc::strong_count(&a), 1);
 /// ```
 pub struct Rc<T> {
     inner: *mut RcInner<T>,

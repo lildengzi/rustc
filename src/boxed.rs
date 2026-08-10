@@ -10,7 +10,7 @@ use std::ops::{Deref, DerefMut};
 /// # Examples
 ///
 /// ```
-/// let b = rustc::Box::new(5);
+/// let b = rustcpp::Box::new(5);
 /// assert_eq!(*b, 5);
 /// ```
 pub struct Box<T> {
