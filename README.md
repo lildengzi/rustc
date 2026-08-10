@@ -2,7 +2,7 @@
 
 ![alt text](assets/images/image1.png)
 
-rustc —— 让你用 Rust 的语法，体验 C++ 的崩溃。编译全部通过，运行时看缘分。
+rustc —— 让你用 Rust 的语法，体验 C++ 的崩溃🤣。编译全部通过，运行时看缘分。
 
 > 这不是「内存安全」。这是「长得像内存安全的 Rust」。
 >
