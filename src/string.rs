@@ -21,7 +21,7 @@ impl String {
         if cap == 0 {
             return String::new();
         }
-        let layout = Layout::array::<u8>(cap).expect("capacity overflow");
+        let layout = unsafe { Layout::from_size_align_unchecked(cap, 1) };
         let ptr = unsafe { alloc(layout) };
         String { ptr, len: 0, cap }
     }
@@ -52,11 +52,11 @@ impl String {
             let new_cap = need.max(self.cap * 2).max(8);
             let new_ptr = unsafe {
                 if self.cap == 0 {
-                    alloc(Layout::array::<u8>(new_cap).expect("capacity overflow"))
+                    alloc(Layout::from_size_align_unchecked(new_cap, 1))
                 } else {
                     realloc(
                         self.ptr,
-                        Layout::array::<u8>(self.cap).expect("capacity overflow"),
+                        Layout::from_size_align_unchecked(self.cap, 1),
                         new_cap,
                     )
                 }
@@ -113,7 +113,7 @@ impl Drop for String {
     fn drop(&mut self) {
         if self.cap != 0 {
             unsafe {
-                dealloc(self.ptr, Layout::array::<u8>(self.cap).expect("capacity overflow"));
+                dealloc(self.ptr, Layout::from_size_align_unchecked(self.cap, 1));
             }
         }
     }
