@@ -1,23 +1,49 @@
 # rustc
 
-![alt text](assets/images/image1.png)
+![rustc](assets/images/image1.png)
 
-rustc —— 让你用 Rust 的语法，体验 C++ 的崩溃🤣。编译全部通过，运行时看缘分。
+Drop-in, API-compatible reimplementations of the standard library's most-used
+types — `String`, `Vec`, `Box`, `Rc` — plus a `spawn` thread helper and the
+`vec!` macro. Zero dependencies, zero warnings, safe-looking surface:
 
-> 这不是「内存安全」。这是「长得像内存安全的 Rust」。
->
-> 公开 API 与标准库**同名同貌**：`String`、`Vec`、`Box`、`Rc`、`spawn`、`vec!`。
-> `use rustc::*` 之后，你的代码跟官方文档抄出来的一模一样——编译零错误零警告，
-> 公开 API 零 `unsafe`，运行不 panic。唯一的问题：它其实是 C++，只是穿了件 Rust 的外套。
->
-> 当你第一次感叹「Rust 不过如此」的时候：
-> - 你的 `String::clone()` 已经准备好在作用域结束那刻**双释**给你看；
-> - 你的 `for x in &v` 迭代器正在和 `v.push` 抢同一块内存；
-> - 你的 `Rc` 在 8 个线程里数引用计数，数出了 3342；
-> - 你 `spawn` 出去的闭包，正在读一个已经下班的局部变量；
-> - 你 hold 住的 `&'static str`，背后其实是一个已经 free 的坑。
->
-> 全是用 `unsafe` 实现的**真实未定义行为**——不是模拟，是真的。
-> 没有 panic，只有崩；没有报错，只有 `free(): double free detected` 教你重新做人。
->
-> **千万不要在生产环境使用。** 更不要在生产环境旁边使用。
+```rust
+use rustc::*;
+
+let mut s = String::from("hello");
+s.push_str(", world");
+println!("{s}");
+
+let v = vec![1, 2, 3];
+for &x in &v {
+    println!("{x}");
+}
+```
+
+Everything compiles exactly like the std types, implements the same traits,
+and behaves identically in ordinary use.
+
+## ⚠️ Do not use this crate in production
+
+This crate is an **educational prank**, and the previous paragraph is the
+joke. It compiles cleanly and never panics by design, but the runtime
+behavior is **deliberately, genuinely undefined**:
+
+- `String` hands out a `&'static str` into a buffer it later frees — hold
+  it across a drop and you have a use-after-free.
+- `Vec` iterators are not bound to the collection, so mutating while
+  iterating compiles — and corrupts memory.
+- `Box` is shallow-cloneable; dropping two clones frees the same pointer
+  twice.
+- `Rc` keeps its count in a non-atomic cell yet claims to be thread-safe;
+  across threads the count silently corrupts.
+- `spawn` erases closure lifetimes, so a thread can read a local the
+  caller has already dropped.
+
+These are **not simulations**. They are real C++-style undefined behavior
+implemented with `unsafe`: expect garbage reads, wrong results, data
+races, and `free(): double free detected` aborts.
+
+**Do not use this crate in production, in anything user-facing, or in any
+code that must not crash or corrupt memory.** The author accepts no
+responsibility for any consequence of using it. Run the `examples/`
+binaries if you want to watch each trap fire.

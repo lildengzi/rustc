@@ -1,10 +1,24 @@
 use std::ops::{Deref, DerefMut};
 
+/// An owned pointer to a heap-allocated `T`, API-compatible with
+/// `std::boxed::Box`.
+///
+/// A `Box` dereferences to `T` and can be constructed from any value via
+/// [`From`]. Use it when you need a heap allocation whose size is unknown
+/// at compile time.
+///
+/// # Examples
+///
+/// ```
+/// let b = rustc::Box::new(5);
+/// assert_eq!(*b, 5);
+/// ```
 pub struct Box<T> {
     ptr: *mut T,
 }
 
 impl<T> Box<T> {
+    /// Allocates memory on the heap and places `value` in it.
     pub fn new(value: T) -> Self {
         let ptr = std::boxed::Box::into_raw(std::boxed::Box::new(value));
         Box { ptr }

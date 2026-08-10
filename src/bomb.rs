@@ -1,11 +1,16 @@
 use crate::String;
 
+/// A [`String`] wrapper that reads its contents back when dropped.
+///
+/// Constructed with [`DropBomb::new`], it holds both a [`String`] and a
+/// view of that string, and prints the contents during destruction.
 pub struct DropBomb {
     s: String,
     dangling: &'static str,
 }
 
 impl DropBomb {
+    /// Wraps the given text into a new `DropBomb`.
     pub fn new(text: &str) -> Self {
         let s = String::from(text);
         let dangling = s.as_str();

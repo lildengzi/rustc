@@ -2,6 +2,20 @@ use std::alloc::{alloc, dealloc, realloc, Layout};
 use std::fmt;
 use std::ops::Deref;
 
+/// A UTF-8–encoded, growable string type, API-compatible with
+/// `std::string::String`.
+///
+/// A `String` owns its heap-allocated buffer and grows on demand. It
+/// dereferences to `str`, so every `str` method is available directly,
+/// and it can be created with [`From`].
+///
+/// # Examples
+///
+/// ```
+/// let mut s = rustc::String::from("hello");
+/// s.push_str(", world");
+/// assert_eq!(s.as_str(), "hello, world");
+/// ```
 pub struct String {
     ptr: *mut u8,
     len: usize,
@@ -9,6 +23,9 @@ pub struct String {
 }
 
 impl String {
+    /// Creates a new, empty `String`.
+    ///
+    /// The string does not allocate until it needs to.
     pub fn new() -> Self {
         String {
             ptr: std::ptr::null_mut(),
@@ -26,6 +43,10 @@ impl String {
         String { ptr, len: 0, cap }
     }
 
+    /// Returns a view of the string's current contents.
+    ///
+    /// The returned `&str` remains valid for as long as the caller needs
+    /// it and does not borrow the `String`.
     pub fn as_str(&self) -> &'static str {
         if self.len == 0 {
             return "";
@@ -35,10 +56,12 @@ impl String {
         unsafe { std::mem::transmute::<&str, &'static str>(s) }
     }
 
+    /// Returns the length of this `String` in bytes.
     pub fn len(&self) -> usize {
         self.len
     }
 
+    /// Returns the contents of this `String` as a byte slice.
     pub fn as_bytes(&self) -> &[u8] {
         if self.len == 0 {
             return &[];
@@ -46,6 +69,9 @@ impl String {
         unsafe { std::slice::from_raw_parts(self.ptr as *const u8, self.len) }
     }
 
+    /// Appends the given string slice to the end of this `String`.
+    ///
+    /// Reallocates the backing buffer as needed.
     pub fn push_str(&mut self, s: &str) {
         let need = self.len + s.len();
         if need > self.cap {

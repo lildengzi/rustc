@@ -1,9 +1,27 @@
 use std::ops::Index;
 
+/// A growable, heap-allocated buffer of `T`, API-compatible with
+/// `std::vec::Vec`.
+///
+/// A `Vec` supports `push`, indexing, and iteration in both borrowed and
+/// owned forms, and converts from `std::vec::Vec` via [`From`].
+///
+/// # Examples
+///
+/// ```
+/// let mut v = rustc::Vec::new();
+/// v.push(1);
+/// v.push(2);
+/// assert_eq!(v[1], 2);
+/// ```
 pub struct Vec<T> {
     inner: std::vec::Vec<T>,
 }
 
+/// An iterator over the elements of a [`Vec`], produced by [`Vec::iter`]
+/// and by iterating over `&Vec`.
+///
+/// Each call to [`Iterator::next`] yields the next element.
 pub struct VecIter<T> {
     ptr: *const T,
     end: *const T,
@@ -33,20 +51,26 @@ impl<T: 'static> Iterator for VecIter<T> {
 }
 
 impl<T> Vec<T> {
+    /// Creates a new, empty `Vec`.
+    ///
+    /// The vector does not allocate until an element is pushed.
     pub fn new() -> Self {
         Vec {
             inner: std::vec::Vec::new(),
         }
     }
 
+    /// Appends an element to the back of the `Vec`.
     pub fn push(&mut self, value: T) {
         self.inner.push(value);
     }
 
+    /// Returns the number of elements in the `Vec`.
     pub fn len(&self) -> usize {
         self.inner.len()
     }
 
+    /// Returns an iterator over the elements of the `Vec`.
     pub fn iter(&self) -> VecIter<T> {
         VecIter::new(self)
     }

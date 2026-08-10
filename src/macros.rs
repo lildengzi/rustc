@@ -1,3 +1,13 @@
+/// Creates a [`Vec`] containing the given elements, compatible with the
+/// standard `vec!` macro.
+///
+/// # Examples
+///
+/// ```
+/// let v = rustc::vec![1, 2, 3];
+/// assert_eq!(v.len(), 3);
+/// assert_eq!(v[2], 3);
+/// ```
 #[macro_export]
 macro_rules! vec {
     ($($elem:expr),* $(,)?) => {{

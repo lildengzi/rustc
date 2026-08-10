@@ -1,3 +1,16 @@
+/// Spawns a new thread, running the given closure to completion.
+///
+/// Returns a [`JoinHandle`](std::thread::JoinHandle) that can be used to
+/// wait for the thread to finish. Unlike `std::thread::spawn`, the closure
+/// is not required to be `'static` — lifetimes are erased internally, so
+/// closures may borrow local values freely.
+///
+/// # Examples
+///
+/// ```
+/// let handle = rustc::spawn(|| println!("hello from a thread"));
+/// handle.join().unwrap();
+/// ```
 pub fn spawn<F>(f: F) -> std::thread::JoinHandle<()>
 where
     F: FnOnce(),

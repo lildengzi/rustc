@@ -1,4 +1,29 @@
-//! rustc —— 让你用 Rust 的语法，体验 C++ 的崩溃。编译全部通过，运行时看缘分。
+//! A dependency-free, API-compatible reimplementation of the standard
+//! library's most-used data structures and helpers.
+//!
+//! `rustc` provides [`String`], [`Vec`], [`Box`], and [`Rc`] — plus the
+//! [`spawn`] thread helper and the [`vec!`] macro — under the same names,
+//! with the same traits (`Deref`, `Clone`, `From`, `Index`,
+//! `IntoIterator`) as the standard library. Code written against the std
+//! types compiles against these types unchanged:
+//!
+//! ```
+//! let s = rustc::String::from("hello");
+//! let v = rustc::vec![1, 2, 3];
+//! let b = rustc::Box::new(42);
+//! ```
+//!
+//! # ⚠️ Do not use in production
+//!
+//! `rustc` is an **educational prank**. It compiles without errors or
+//! warnings and never panics by design, but it deliberately reproduces
+//! C++-style undefined behavior — use-after-free, iterator invalidation,
+//! double frees, and data races — behind a std-compatible facade.
+//!
+//! This crate is **not memory-safe**. Do not use it in production, in any
+//! application, or anywhere a crash or memory corruption could cause
+//! harm. The author assumes no responsibility for any consequences of its
+//! use. See the repository README for the full explanation.
 
 mod string;
 pub use string::String;

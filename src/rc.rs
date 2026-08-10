@@ -6,11 +6,27 @@ struct RcInner<T> {
     count: Cell<usize>,
 }
 
+/// A reference-counted pointer, API-compatible with `std::rc::Rc`.
+///
+/// An `Rc` enables multiple ownership by keeping a reference count; the
+/// value is dropped when the last strong reference goes away. Values are
+/// read through [`Deref`], and new owners are created with [`Clone`].
+///
+/// # Examples
+///
+/// ```
+/// let a = rustc::Rc::new(5);
+/// let b = a.clone();
+/// assert_eq!(rustc::Rc::strong_count(&a), 2);
+/// drop(b);
+/// assert_eq!(rustc::Rc::strong_count(&a), 1);
+/// ```
 pub struct Rc<T> {
     inner: *mut RcInner<T>,
 }
 
 impl<T> Rc<T> {
+    /// Creates a new `Rc` with an initial strong count of one.
     pub fn new(value: T) -> Self {
         let inner = std::boxed::Box::into_raw(std::boxed::Box::new(RcInner {
             value,
@@ -19,6 +35,7 @@ impl<T> Rc<T> {
         Rc { inner }
     }
 
+    /// Returns the number of strong references to the given `Rc`.
     pub fn strong_count(this: &Self) -> usize {
         unsafe { (*this.inner).count.get() }
     }

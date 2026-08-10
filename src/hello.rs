@@ -1,3 +1,10 @@
+/// Returns the classic `"hello world"` greeting as a static string.
+///
+/// # Examples
+///
+/// ```
+/// let d: &'static str = rustc::hello_world();
+/// ```
 pub fn hello_world() -> &'static str {
     let bytes = *b"hello world";
     let ptr = bytes.as_ptr();

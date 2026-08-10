@@ -2,5 +2,11 @@
 name = "rustc"
 version = "0.1.0"
 edition = "2024"
+description = "A std-compatible facade that compiles cleanly yet deliberately reproduces classic C++ undefined behavior. Educational prank — do not use in production."
+keywords = ["prank", "educational", "unsafe", "undefined-behavior"]
+categories = ["development-tools"]
+readme = "README.md"
+license = "MIT"
+documentation = "https://docs.rs/rustc"
 
 [dependencies]
